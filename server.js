@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 app.use(express.static('public'));
 
 // MongoDB connection setup
-mongoose.connect('mongodb://localhost:27017/personalwebsite', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect('mongodb://saidb:qPumSr1TVidrgKvhLuXORIj7NhSNZGI9KEZEd7Egfn7OrnrXpBfKXRYrhjHJWvQhj1AgD5BbfLVMACDbbE9uLA==@saidb.mongo.cosmos.azure.com:10255/?ssl=true&retrywrites=false&maxIdleTimeMS=120000&appName=@saidb@', { useNewUrlParser: true, useUnifiedTopology: true });
 const db = mongoose.connection;
 
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
