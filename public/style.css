@@ -1,0 +1,40 @@
+/* Add this to your styles.css file or create a new one */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 20px;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+textarea, input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+#notepadEntries, #taskEntries {
+    margin-top: 20px;
+}
+
+p {
+    margin-bottom: 5px;
+}
+

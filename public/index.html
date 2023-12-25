@@ -1,0 +1,368 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+  
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Your Personal Website</title>
+        <link rel="stylesheet" href="tailwind.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <style>
+            #notepadEntries {
+                max-height: 1000px; /* Adjust the max-height as needed */
+                overflow-y: auto;
+                border: 1px solid #ddd;
+                padding: 5px;
+                margin-bottom: 5px;
+            }
+    
+            .notepad-entry {
+                display: flex;
+                align-items: center;
+                border: 1px solid #ddd;
+                padding: 5px;
+                margin-bottom: 5px;
+            }
+    
+            .copy-delete-icons i {
+                font-size: 0.9rem;
+                margin-right: 5px; /* Adjust the value to increase or decrease space */
+                cursor: pointer;
+                transition: color 0.3s ease;
+                padding: 5px;
+                margin-bottom: 5px;
+            }
+    
+            .copy-delete-icons i:hover {
+                color: #4CAF50; /* Copy icon hover color */
+            }
+    
+            .delete-icon i:hover {
+                color: #FF0000; /* Delete icon hover color */
+            }
+    
+            .copy-delete-icons {
+                display: flex;
+                flex-direction: column;
+                margin-right: 100px;
+            }
+    
+            .notepad-content {
+                flex-grow: 1;
+                overflow: auto;
+            }
+        </style>
+    </head>
+   
+    
+    <body class="bg-gray-100 text-gray-800 font-sans">
+    
+        <div class="container mx-auto my-8 p-8 bg-white rounded shadow-md">
+
+            <div id="app" class="text-4xl mb-8 text-center">Welcome to Your Personal Website!</div>
+    
+            <!-- Notepad Section -->
+            <div class="mb-8">
+                <h2 class="text-2xl mb-4">Notepad</h2>
+                <form id="notepadForm">
+                    <label for="notepadContent" class="block mb-2">Notepad Content:</label>
+                    <textarea id="notepadContent" name="notepadContent"
+                        class="w-full p-2 mb-2 border rounded"></textarea>
+                    <div class="flex justify-end items-center gap-4">
+                        <button type="button" id="saveNotepadBtn"
+                            class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:shadow-outline-green">Save</button>
+                        <button type="button" id="retrieveNotepadBtn"
+                            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue">Retrieve</button>
+                        <button type="button" id="clearNotepadEntryBtn"
+                            class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:shadow-outline-red">Clear Entry</button>
+                        <button type="button" id="clearAllNotepadEntriesBtn"
+                            class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 focus:outline-none focus:shadow-outline-gray">Clear All Entries</button>
+    
+                    </div>
+                </form>
+                <div id="notepadEntries" class="mt-4"></div>
+            </div>
+    
+            <!-- Tasks Section -->
+            <div>
+                <h2 class="text-2xl mb-4">Tasks</h2>
+                <form id="taskForm">
+                    <label for="taskTitle" class="block mb-2">Task Title:</label>
+                    <input type="text" id="taskTitle" name="taskTitle"
+                        class="w-full p-2 mb-2 border rounded" required>
+                    <label for="taskDescription" class="block mb-2">Task Description:</label>
+                    <textarea id="taskDescription" name="taskDescription"
+                        class="w-full p-2 mb-2 border rounded"></textarea>
+                    <label for="taskDueDate" class="block mb-2">Due Date:</label>
+                    <input type="date" id="taskDueDate" name="taskDueDate"
+                        class="w-full p-2 mb-2 border rounded" required>
+                    <div class="flex justify-end items-center gap-4">
+                        <button type="button" id="saveTaskBtn"
+                            class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:shadow-outline-green">Save Task</button>
+                        <button type="button" id="retrieveTasksBtn"
+                            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue">Retrieve All</button>
+                        <button type="button" id="retrieveCompletedTasksBtn"
+                            class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 focus:outline-none focus:shadow-outline-purple">Completed This Week</button>
+                    </div>
+                </form>
+                <div id="taskEntries" class="mt-4"></div>
+            </div>
+    
+        </div>
+    <script src="bundle.js"></script>
+    <script>
+
+        // Let's add some content to the page using JavaScript
+        document.getElementById('app').innerHTML = '<h1> Personal Website!</h1>';
+
+        // Function to save notepad entry
+        function clearNotepadEntry(index) {
+        const notepadEntriesDiv = document.getElementById('notepadEntries');
+        const entries = Array.from(notepadEntriesDiv.children);
+
+        if (index >= 0 && index < entries.length) {
+            entries[index].remove();
+        }
+    }
+
+
+    // Add event listeners for the new buttons
+    document.getElementById('clearNotepadEntryBtn').addEventListener('click', function () {
+        const entryIndex = prompt('Enter the index of the entry to clear:');
+        clearNotepadEntry(parseInt(entryIndex, 10));
+    });
+
+    document.getElementById('clearAllNotepadEntriesBtn').addEventListener('click', clearAllNotepadEntries);
+
+    function saveNotepad() {
+    const notepadContent = document.getElementById('notepadContent').value;
+
+    // Validate if notepadContent is not empty
+    if (notepadContent === '') {
+        alert('Notepad content cannot be empty!');
+        return;
+    }
+
+
+    // Example API usage to save notepad data
+    fetch('/api/notepad', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            content: notepadContent,
+        }),
+    })
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .catch(error => console.error('Error saving notepad data:', error));
+}
+
+        function retrieveNotepad() {
+        // Example API usage to retrieve notepad data
+        fetch('/api/notepad')
+            .then(response => response.json())
+            .then(data => {
+                const notepadEntriesDiv = document.getElementById('notepadEntries');
+                notepadEntriesDiv.innerHTML = '<h2>Notepad Entries:</h2>';
+                
+                if (data.length > 0) {
+                    data.forEach(entry => {
+                        const entryDiv = document.createElement('div');
+                        entryDiv.className = 'notepad-entry';
+
+                        const iconsDiv = document.createElement('div');
+                        iconsDiv.className = 'copy-delete-icons';
+                        
+                        // Copy icon
+                        const copyIcon = document.createElement('i');
+                        copyIcon.className = 'fas fa-copy';
+                        copyIcon.onclick = function() {
+                            copyToClipboard(entry.content);
+                        };
+                        iconsDiv.appendChild(copyIcon);
+
+                        // Delete icon
+                        const deleteIcon = document.createElement('i');
+                        deleteIcon.className = 'fas fa-trash-alt delete-icon';
+                        deleteIcon.onclick = function() {
+                            deleteNotepadEntry(entry._id);
+                        };
+                        iconsDiv.appendChild(deleteIcon);
+
+                        const contentDiv = document.createElement('div');
+                        contentDiv.className = 'notepad-content';
+                        contentDiv.innerHTML = `<p>${entry.content}</p>`;
+
+                        entryDiv.appendChild(iconsDiv);
+                        entryDiv.appendChild(contentDiv);
+                        notepadEntriesDiv.appendChild(entryDiv);
+                    });
+                } else {
+                    notepadEntriesDiv.innerHTML += '<p>No notepad entries found.</p>';
+                }
+            })
+            .catch(error => console.error('Error retrieving notepad data:', error));
+    }
+
+
+        // Function to copy text to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text)
+                .then(() => console.log('Text copied to clipboard'))
+                .catch(err => console.error('Unable to copy text to clipboard', err));
+        }
+        function clearAllNotepadEntries() {
+            // Example API usage to delete all notepad entries
+            fetch('/api/notepad', {
+                method: 'DELETE',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    retrieveNotepad(); // Refresh the notepad entries after deletion
+                })
+                .catch(error => console.error('Error deleting all notepad entries:', error));
+        }
+        function completeTask(taskId) {
+        // Example API usage to mark a task as complete
+        console.log('Task ID:', taskId);
+        fetch(`/api/tasks/${taskId}/complete`, {
+            method: 'DELETE',
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                retrieveTasks(); // Refresh the task entries after completion
+            })
+            .catch(error => console.error('Error completing task:', error));
+        }
+
+
+        function deleteNotepadEntry(entryId) {
+            // Example API usage to delete a notepad entry
+            fetch(`/api/notepad/${entryId}`, {
+                method: 'DELETE',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    retrieveNotepad(); // Refresh the notepad entries after deletion
+                })
+                .catch(error => console.error('Error deleting notepad entry:', error));
+        }
+
+        // Function to save task
+        function saveTask() {
+            const taskTitle = document.getElementById('taskTitle').value;
+            const taskDescription = document.getElementById('taskDescription').value;
+            const taskDueDate = document.getElementById('taskDueDate').value;
+            if (taskTitle === '') {
+            alert('taskTitle cannot be empty!');
+            return;
+            }
+            if (taskDescription === '') {
+            alert('taskDescription cannot be empty!');
+            return;
+            }
+            // Example API usage to save task data
+            fetch('/api/tasks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: taskTitle,
+                    description: taskDescription,
+                    dueDate: taskDueDate,
+                }),
+            })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error saving task data:', error));
+        }
+
+      // Function to retrieve all tasks
+function retrieveTasks() {
+    // Example API usage to retrieve all tasks
+    fetch('/api/tasks')
+        .then(response => response.json())
+        .then(data => {
+            const taskEntriesDiv = document.getElementById('taskEntries');
+            taskEntriesDiv.innerHTML = '<h2>All Tasks:</h2>';
+
+            if (data.length > 0) {
+                data.forEach(task => {
+                    const taskEntryDiv = document.createElement('div');
+                    taskEntryDiv.className = 'task-entry';
+
+                    const completeIcon = document.createElement('i');
+                    completeIcon.className = 'fas fa-check complete-icon';
+                    completeIcon.onclick = function () {
+                        completeTask(task._id);
+                    };
+
+                    const taskDetails = document.createElement('p');
+                    taskDetails.innerHTML = `${task.title} - ${task.description} - Due: ${new Date(task.dueDate).toLocaleDateString()}`;
+
+                    const completeButton = document.createElement('button');
+                    completeButton.className = 'complete-btn';
+                    completeButton.innerText = 'Complete';
+                    completeButton.onclick = function () {
+                        completeTask(task._id);
+                    };
+
+                    // taskEntryDiv.appendChild(completeIcon); 
+                    taskEntryDiv.appendChild(taskDetails);
+                    taskEntryDiv.appendChild(completeButton);
+                    taskEntriesDiv.appendChild(taskEntryDiv);
+                });
+            } else {
+                taskEntriesDiv.innerHTML += '<p>No tasks found.</p>';
+            }
+        })
+        .catch(error => console.error('Error retrieving tasks:', error));
+}
+
+
+        // Function to retrieve completed tasks this week
+        function retrieveCompletedTasksThisWeek() {
+            // Example API usage to retrieve completed tasks this week
+            fetch('/api/tasks/completedThisWeek')
+                .then(response => response.json())
+                .then(data => {
+                    const taskEntriesDiv = document.getElementById('taskEntries');
+                    taskEntriesDiv.innerHTML = '<h2>Completed Tasks This Week:</h2>';
+                    
+                    if (data.length > 0) {
+                        data.forEach(task => {
+                            taskEntriesDiv.innerHTML += `<p>${task.title} - ${task.description} - Due: ${new Date(task.dueDate).toLocaleDateString()}</p>`;
+                        });
+                    } else {
+                        taskEntriesDiv.innerHTML += '<p>No completed tasks found this week.</p>';
+                    }
+                })
+                .catch(error => console.error('Error retrieving completed tasks this week:', error));
+        }
+
+        // Add event listeners after the DOM has loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('saveNotepadBtn').addEventListener('click', saveNotepad);
+            document.getElementById('retrieveNotepadBtn').addEventListener('click', retrieveNotepad);
+            document.getElementById('saveTaskBtn').addEventListener('click', saveTask);
+            document.getElementById('retrieveTasksBtn').addEventListener('click', retrieveTasks);
+            document.getElementById('retrieveCompletedTasksBtn').addEventListener('click', retrieveCompletedTasksThisWeek);
+            document.getElementById('clearNotepadEntryBtn').addEventListener('click', function () {
+    const entryIndex = prompt('Enter the index of the entry to clear:');
+    clearNotepadEntry(parseInt(entryIndex, 10));
+});
+
+document.getElementById('clearAllNotepadEntriesBtn').addEventListener('click', clearAllNotepadEntries);
+
+        });
+    </script>
+</body>
+</html>
